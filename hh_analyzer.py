@@ -33,7 +33,7 @@ def fetch_vacancies(skills, location, experience, specialty=None):
 
     experience_mapped = map_experience(experience)
 
-    # Разбиваем навыки и берём первые три
+    # Разбиваем навыки и бефвыафывафывафыварём первые три
     skills_list = [s.strip() for s in skills.split(',')]
     top_skills = ' '.join(skills_list[:3])  # Берём первые три навыка
 
