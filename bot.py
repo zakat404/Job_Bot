@@ -58,7 +58,6 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 
-# Функция для отправки запроса в GigaChat
 def send_to_gigachat(content):
     headers = {
         "Authorization": f"Bearer {GIGACHAT_TOKEN}",
@@ -84,7 +83,6 @@ def send_to_gigachat(content):
         return None
 
 
-# Функция для подготовки промпта и обработки ответа
 def process_resume(text):
     prompt = (
         "Извлеките следующую информацию из текста резюме и верните её в формате JSON:\n"
@@ -113,7 +111,21 @@ def process_resume(text):
     return None
 
 
-# Обработчик получения PDF файла
+def map_experience(experience):
+    experience_str = str(experience).lower()
+
+    if "без опыта" in experience_str or "0" in experience_str:
+        return "noExperience"
+    elif "1" in experience_str or "2 года" in experience_str:
+        return "between1And3"
+    elif "3" in experience_str or "4" in experience_str or "5" in experience_str:
+        return "between3And6"
+    elif "6" in experience_str or "более" in experience_str:
+        return "moreThan6"
+    else:
+        return "noExperience"
+
+
 async def handle_pdf(update: Update, context):
     file = await context.bot.get_file(update.message.document.file_id)
     file_name = update.message.document.file_name
@@ -122,19 +134,18 @@ async def handle_pdf(update: Update, context):
     await file.download_to_drive(file_path)
     await update.message.reply_text("Резюме получено. Обрабатываю данные...")
 
-    # Извлечение текста из PDF
     try:
         text = extract_text(file_path)
         if not text.strip():
             await update.message.reply_text(
-                "Не удалось извлечь текст из PDF. Убедитесь, что документ содержит текст, а не только изображения.")
+                "Не удалось извлечь текст из PDF. Убедитесь, что документ содержит текст, а не только изображения."
+            )
             return
     except Exception as e:
         logging.error(f"Ошибка извлечения текста из PDF: {e}")
         await update.message.reply_text("Ошибка при обработке PDF файла.")
         return
 
-    # Обработка текста резюме
     result = process_resume(text)
 
     if result:
@@ -143,14 +154,20 @@ async def handle_pdf(update: Update, context):
             new_resume = Resume(**result)
             session.add(new_resume)
             session.commit()
+
             await update.message.reply_text("Данные успешно сохранены в базу.")
 
-            # Вызов функции анализа вакансий
-            vacancies = fetch_vacancies(result["skills"], result["location"])
+            skills = result.get("skills", "Python")
+            location = result.get("location", "Санкт-Петербург")
+            experience = result.get("experience", "0")
+            specialty = result.get("specialty", "Разработчик")
+
+            vacancies = fetch_vacancies(skills, location, experience, specialty)
+
             if vacancies:
                 response_message = "Подходящие вакансии:\n"
                 for vacancy in vacancies:
-                    response_message += f"- [{vacancy['title']}]({vacancy['url']})\n"
+                    response_message += f"- [{vacancy['name']}]({vacancy['alternate_url']})\n"
                 await update.message.reply_text(response_message, parse_mode="Markdown")
             else:
                 await update.message.reply_text("К сожалению, подходящих вакансий не найдено.")
@@ -166,7 +183,6 @@ async def handle_pdf(update: Update, context):
 def main():
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
-    # Обработчик для приема PDF-файлов
     application.add_handler(MessageHandler(filters.Document.PDF, handle_pdf))
 
     application.run_polling()
