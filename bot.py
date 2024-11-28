@@ -14,7 +14,7 @@ from hh_analyzer import fetch_vacancies
 # Отключение предупреждений об SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Загрузка переменных окружения из .env
+# Загрузка переменных окasdfasdfadsfasdfружения из .env
 load_dotenv()
 
 # Настройки
