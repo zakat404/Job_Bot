@@ -1,2 +1,9 @@
-.env
-/resumes
+*
+
+!.gitignore
+
+# Исключить
+!hh_analyzer.py
+!bot.py
+!README.md
+!requierements.txt

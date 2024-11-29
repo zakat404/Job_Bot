@@ -5,7 +5,7 @@ HH_API_URL = "https://api.hh.ru/vacancies"
 
 
 def get_area_id(city_name):
-    """Получить идентификатор региона по названию города."""
+# Получить идентификатор региона по названию города
     try:
         response = requests.get("https://api.hh.ru/areas")
         if response.status_code == 200:
@@ -33,11 +33,11 @@ def fetch_vacancies(skills, location, experience, specialty=None):
 
     experience_mapped = map_experience(experience)
 
-    # Разбиваем навыки и бефвыафывафывафыварём первые три
+# Разбиваем навыки
     skills_list = [s.strip() for s in skills.split(',')]
-    top_skills = ' '.join(skills_list[:3])  # Берём первые три навыка
+    top_skills = ' '.join(skills_list[:3])
 
-    # Формируем упрощённый поисковый запрос
+# Формируем упрощённый поисковый запрос
     if specialty:
         search_text = f"{specialty} {top_skills}"
     else:
@@ -68,7 +68,7 @@ def fetch_vacancies(skills, location, experience, specialty=None):
         return None
 
 def map_experience(experience):
-    """Сопоставляет опыт работы с форматами API hh.ru."""
+# Сопоставляет опыт работы с форматами API hh.ru.
     experience_str = str(experience).lower()
 
     if "без опыта" in experience_str or "0" in experience_str:

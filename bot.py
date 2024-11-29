@@ -34,7 +34,7 @@ GIGACHAT_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 # Настройка логирования
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
-# Настройка базы данных
+# Настройка бд
 engine = create_engine(DATABASE_URL)
 Base = declarative_base()
 
