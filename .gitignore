@@ -1,9 +1,16 @@
+# Игнорировать все файлы
 *
 
+# Оставить только необходимые файлы
 !.gitignore
-
-# Исключить
+!schemas.py
 !hh_analyzer.py
 !bot.py
 !README.md
-!requierements.txt
+!requirements.txt
+
+# Игнорировать системные и временные файлы
+__pycache__/
+.idea/
+*.pyc
+.DS_Store
